@@ -88,6 +88,7 @@ namespace System
         public static readonly string Empty = null;
         public String(char[] value) { }
         public String(char[] value, int startIndex, int length) { }
+        public static String Ctor(char[] value) => null;
         public string ToUpperInvariant() => this;
         public string Substring(int startIndex) => throw null;
         public string Substring(int startIndex, int length) => throw null;
@@ -373,27 +374,4 @@ namespace Internal.Runtime.CompilerHelpers
         internal static void ThrowInvalidProgramExceptionWithArgument(ExceptionStringID id, string methodName) => throw null; internal static void ThrowMarshalDirectiveException(ExceptionStringID id) => Fail();
         internal static void ThrowAmbiguousMatchException(ExceptionStringID id) => Fail();         internal static void ThrowNotSupportedInlineArrayEqualsGetHashCode() => Fail(); internal static void ThrowIndexOutOfRangeException() => Fail();
     }
-}
-
-namespace System.Runtime
-{
-    public static class TypeCast
-    {
-        public static object? Cast(object? value, System.Type targetType) => null;
-        public static bool IsInstanceOf(object? value, System.Type targetType) => false;
-        public static bool CheckCastAny(object? value, System.Type targetType) => false;
-        public static bool CheckCastInterface(object? value, System.Type targetType) => false;
-        public static bool CheckCastClass(object? value, System.Type targetType) => false;
-        public static bool CheckCastClassSpecial(object? value, System.Type targetType) => false;
-        public static bool CheckCastClassSpecial(object? value, IntPtr targetType) => false;
-        public static object? CastAny(object? value, System.Type targetType) => null;
-        public static object? CastInterface(object? value, System.Type targetType) => null;
-        public static object? CastToType(object? value, System.Type targetType) => null;
-        public static void StelemRef(object[] array, int index, object value) { }
-    }
-}
-
-namespace System.Runtime
-{
-    public static class RuntimeExports { }
 }

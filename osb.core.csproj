@@ -32,6 +32,7 @@
     <Compile Include="src/Math.cs" />
     <Compile Include="src/MiniCoreLib.cs" />
     <Compile Include="src/PrimitiveTypes.cs" />
+    <Compile Include="src/RuntimeSupport.cs" />
     <Compile Include="src/StringComparison.cs" />
     <Compile Include="src/StringComparer.cs" />
     <Compile Include="src/DateTime.cs" />

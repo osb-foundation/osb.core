@@ -371,6 +371,29 @@ namespace Internal.Runtime.CompilerHelpers
         internal static void ThrowMissingMethodException(ExceptionStringID id, string methodName) => Fail(); internal static void ThrowMissingFieldException(ExceptionStringID id, string fieldName) => Fail();
         internal static void ThrowFileNotFoundException(ExceptionStringID id, string fileName) => Fail(); internal static void ThrowInvalidProgramException(ExceptionStringID id) => Fail();
         internal static void ThrowInvalidProgramExceptionWithArgument(ExceptionStringID id, string methodName) => throw null; internal static void ThrowMarshalDirectiveException(ExceptionStringID id) => Fail();
-        internal static void ThrowAmbiguousMatchException(ExceptionStringID id) => Fail(); internal static void ThrowNotSupportedInlineArrayEqualsGetHashCode() => Fail(); internal static void ThrowIndexOutOfRangeException() => Fail();
+        internal static void ThrowAmbiguousMatchException(ExceptionStringID id) => Fail();         internal static void ThrowNotSupportedInlineArrayEqualsGetHashCode() => Fail(); internal static void ThrowIndexOutOfRangeException() => Fail();
     }
+}
+
+namespace System.Runtime
+{
+    public static class TypeCast
+    {
+        public static object? Cast(object? value, System.Type targetType) => null;
+        public static bool IsInstanceOf(object? value, System.Type targetType) => false;
+        public static bool CheckCastAny(object? value, System.Type targetType) => false;
+        public static bool CheckCastInterface(object? value, System.Type targetType) => false;
+        public static bool CheckCastClass(object? value, System.Type targetType) => false;
+        public static bool CheckCastClassSpecial(object? value, System.Type targetType) => false;
+        public static bool CheckCastClassSpecial(object? value, IntPtr targetType) => false;
+        public static object? CastAny(object? value, System.Type targetType) => null;
+        public static object? CastInterface(object? value, System.Type targetType) => null;
+        public static object? CastToType(object? value, System.Type targetType) => null;
+        public static void StelemRef(object[] array, int index, object value) { }
+    }
+}
+
+namespace System.Runtime
+{
+    public static class RuntimeExports { }
 }

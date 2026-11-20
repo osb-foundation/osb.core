@@ -19,6 +19,7 @@ namespace System
         public virtual int GetHashCode() => 0;
         public virtual string ToString() => null;
         internal MethodTable* GetMethodTable() => m_pEEType;
+        public virtual Type GetType() => null;
     }
 
     public struct Void { }
@@ -28,7 +29,7 @@ namespace System
 #pragma warning disable 0169
     public struct Boolean { private bool _value; }
     [StructLayout(LayoutKind.Sequential)]
-    public struct Char { private char _value; }
+    public struct Char { private char _value; public static bool IsHighSurrogate(char c) => c >= 0xD800 && c <= 0xDBFF; public static bool IsLowSurrogate(char c) => c >= 0xDC00 && c <= 0xDFFF; public static int ConvertToUtf32(char highSurrogate, char lowSurrogate) => ((highSurrogate - 0xD800) << 10) + (lowSurrogate - 0xDC00) + 0x10000; public static bool IsDigit(char c) => c >= '0' && c <= '9'; public static bool IsLetter(char c) => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); public static bool IsLetterOrDigit(char c) => IsLetter(c) || IsDigit(c); }
     [StructLayout(LayoutKind.Sequential)]
     public struct SByte { private sbyte _value; }
     [StructLayout(LayoutKind.Sequential)]
@@ -38,23 +39,21 @@ namespace System
     [StructLayout(LayoutKind.Sequential)]
     public struct UInt16 { private ushort _value; }
     [StructLayout(LayoutKind.Sequential)]
-    public struct Int32 { private int _value; }
+    public struct Int32 { private int _value; public const int MaxValue = 0x7FFFFFFF; public static bool TryParse(string s, out int result) { result = 0; return false; } }
     [StructLayout(LayoutKind.Sequential)]
-    public struct UInt32 { private uint _value; }
+    public struct UInt64 { private ulong _value; public const ulong MaxValue = 0xFFFFFFFFFFFFFFFFUL; }
     [StructLayout(LayoutKind.Sequential)]
-    public struct Int64 { private long _value; }
-    [StructLayout(LayoutKind.Sequential)]
-    public struct UInt64 { private ulong _value; }
+    public struct Int64 { private long _value; public const long MaxValue = 0x7FFFFFFFFFFFFFFFL; }
     [StructLayout(LayoutKind.Sequential)]
     public struct Single { private float _value; }
     [StructLayout(LayoutKind.Sequential)]
-    public struct Double { private double _value; }
+    public struct Double { private double _value; public const double NaN = (double)0x7FF8000000000000L; public const double PositiveInfinity = (double)0x7FF0000000000000L; public const double NegativeInfinity = (double)0xFFF0000000000000L; public static bool IsNaN(double d) => d != d; public static bool IsPositiveInfinity(double d) => PositiveInfinity == d; public static bool IsNegativeInfinity(double d) => NegativeInfinity == d; }
 #pragma warning restore 0169
 
     public abstract class ValueType { }
     public abstract class Enum : ValueType { }
 
-    public struct Nullable<T> where T : struct { }
+    public struct Nullable<T> where T : struct { public bool HasValue; public T Value; }
 
     [StructLayout(LayoutKind.Sequential)]
     public class String
@@ -76,8 +75,25 @@ namespace System
         public static string Concat(object arg0) => throw null;
         public static string Concat(object arg0, object arg1) => throw null;
         public static string Concat(object arg0, object arg1, object arg2) => throw null;
+        public static string Concat(string s1, string s2, string s3, string s4) => throw null;
         public static bool operator ==(string a, string b) => throw null;
         public static bool operator !=(string a, string b) => throw null;
+        public static bool Equals(string a, string b) => throw null;
+        public static bool Equals(string a, string b, StringComparison comparison) => throw null;
+        public bool Equals(string other) => throw null;
+        public bool Equals(string other, StringComparison comparison) => throw null;
+        public static string Format(string format, object arg0) => throw null;
+        public static string Format(string format, object arg0, object arg1) => throw null;
+        public static string Format(string format, object arg0, object arg1, object arg2) => throw null;
+        public static readonly string Empty = null;
+        public String(char[] value) { }
+        public String(char[] value, int startIndex, int length) { }
+        public string ToUpperInvariant() => this;
+        public string Substring(int startIndex) => throw null;
+        public string Substring(int startIndex, int length) => throw null;
+        public string PadLeft(int totalWidth, char paddingChar) => throw null;
+        public string TrimEnd(params char[] trimChars) => throw null;
+        public string Trim() => throw null;
     }
 
     public class Array
@@ -91,6 +107,12 @@ namespace System
         public int Length => _numComponents;
         public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length) => throw null;
         public static void Copy(Array sourceArray, long sourceIndex, Array destinationArray, long destinationIndex, long length) => throw null;
+        public static void Copy(Array sourceArray, Array destinationArray, int length) =>
+            Copy(sourceArray, 0, destinationArray, 0, length);
+        public static void Clear(Array array, int index, int length) => throw null;
+        public static T[] Empty<T>() => throw null;
+        public static void Resize<T>(ref T[] array, int newSize) => throw null;
+        public static int IndexOf(Array array, object value) => -1;
     }
 
     // Generic arrays (T[]) are represented by this pseudo-type; the compiler
@@ -122,6 +144,7 @@ namespace System
     {
         internal static unsafe Type GetTypeFromMethodTable(MethodTable* pMT) => null;
         internal static unsafe Type GetTypeFromMethodTableMaybeNull(MethodTable* pMT) => null;
+        public virtual string Name => null;
     }
 
     public sealed class RuntimeType : Type { }
@@ -263,8 +286,8 @@ namespace System.Runtime.CompilerServices
         [Intrinsic] public static ref T AsRef<T>(in T source) => throw null;
         [Intrinsic] public static T ReadUnaligned<T>(void* source) => throw null;
         [Intrinsic] public static T ReadUnaligned<T>(ref readonly byte source) => throw null;
-        [Intrinsic] public static void CopyBlock(void* destination, void* source, uint byteCount) => throw null;
-        [Intrinsic] public static void CopyBlock(ref byte destination, ref readonly byte source, uint byteCount) => throw null;
+        [Intrinsic] public static void CopyBlock(void* destination, void* source, ulong byteCount) => throw null;
+        [Intrinsic] public static void CopyBlock(ref byte destination, ref readonly byte source, ulong byteCount) => throw null;
 
         public static ref T Add<T>(ref T source, int elementOffset) =>
             ref AddByteOffset(ref source, (IntPtr)(elementOffset * (nint)SizeOf<T>()));
@@ -307,6 +330,8 @@ namespace System
             else { for (nuint i = len; i > 0; i--) dest[i - 1] = src[i - 1]; }
         }
         public static void Memcpy(byte* dest, byte* src, nuint len) => Memmove(dest, src, len);
+        public static unsafe void MemoryCopy(byte* source, byte* destination, nuint byteCount) => Memmove(destination, source, byteCount);
+        public static unsafe void MemoryCopy(byte* source, byte* destination, int sourceBytes, int destinationBytes) => Memmove(destination, source, (nuint)sourceBytes);
         internal static void BulkMoveWithWriteBarrier(ref byte destination, ref byte source, nuint byteCount)
             => SpanHelpers.Memmove(ref destination, ref source, byteCount);
     }
@@ -318,42 +343,6 @@ namespace Internal.Runtime
     internal unsafe struct MethodTable { }
 
     internal enum ExceptionStringID { }
-}
-
-namespace System.Runtime
-{
-    // Cast/array helpers referenced by the NativeAOT compiler. Never executed in
-    // this kernel (we do no casts, allocations or array stores), so fail-fast.
-    internal static unsafe class TypeCast
-    {
-        public static void StelemRef(object[] array, nint index, object obj) => throw null;
-        public static ref object LdelemaRef(object[] array, nint index, MethodTable* elementType) => throw null;
-        public static object CheckCastAny(MethodTable* pTargetType, object obj) => throw null;
-        public static object CheckCastInterface(MethodTable* pTargetType, object obj) => throw null;
-        public static object CheckCastClass(MethodTable* pTargetType, object obj) => throw null;
-        public static object CheckCastClassSpecial(MethodTable* pTargetType, object obj) => throw null;
-        public static object IsInstanceOfAny(MethodTable* pTargetType, object obj) => throw null;
-        public static object IsInstanceOfInterface(MethodTable* pTargetType, object obj) => throw null;
-        public static object IsInstanceOfClass(MethodTable* pTargetType, object obj) => throw null;
-        public static bool IsInstanceOfException(MethodTable* pTargetType, object obj) => throw null;
-    }
-
-    internal static unsafe class RuntimeExports
-    {
-        public static object RhBox(MethodTable* pMT, ref byte data) => throw null;
-        public static object RhUnbox2(MethodTable* pMT, object obj, ref bool pUnboxed) => throw null;
-        public static object RhUnboxNullable(MethodTable* pMT, object obj, ref byte data) => throw null;
-        public static object RhUnboxTypeTest(object obj) => throw null;
-    }
-}
-
-namespace System.Threading
-{
-    internal static class Monitor
-    {
-        public static void SynchronizedMethodEnter(object obj) => throw null;
-        public static void SynchronizedMethodExit(object obj) => throw null;
-    }
 }
 
 namespace Internal.Runtime.CompilerHelpers

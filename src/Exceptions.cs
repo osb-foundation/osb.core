@@ -13,6 +13,7 @@ namespace System
 
     public class ArgumentException : Exception
     {
+        public ArgumentException() { }
         public ArgumentException(string message) : base(message) { }
     }
 
@@ -23,11 +24,13 @@ namespace System
 
     public class ArgumentOutOfRangeException : ArgumentException
     {
+        public ArgumentOutOfRangeException() { }
         public ArgumentOutOfRangeException(string paramName) : base(paramName) { }
     }
 
     public class InvalidOperationException : Exception
     {
+        public InvalidOperationException() { }
         public InvalidOperationException(string message) : base(message) { }
     }
 

@@ -32,3 +32,11 @@ namespace System.Runtime.CompilerServices
         public TupleElementNamesAttribute(string[] transformNames) { }
     }
 }
+
+// Namespaces referenced by C# implicit usings but not used by Engine.Core.
+// Declared empty so `using` directives resolve under NoStdLib compilation.
+namespace System.Linq { }
+namespace System.Threading.Tasks { }
+namespace System.IO { }
+namespace System.Net { }
+namespace System.Net.Http { }

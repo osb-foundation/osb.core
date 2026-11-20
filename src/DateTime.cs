@@ -9,12 +9,12 @@ namespace System
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct DateTime : IEquatable<DateTime>, IComparable<DateTime>
     {
-        private readonly ulong _ticks;
-        public DateTime(ulong ticks) { _ticks = ticks; }
-        public ulong Ticks => _ticks;
+        private readonly long _ticks;
+        public DateTime(long ticks) { _ticks = ticks; }
+        public long Ticks => _ticks;
         public static DateTime UtcNow => new DateTime(0);
         public static DateTime MinValue => new DateTime(0);
-        public static DateTime MaxValue => new DateTime(18446744073709551615UL);
+        public static DateTime MaxValue => new DateTime(long.MaxValue);
         public bool Equals(DateTime other) => _ticks == other._ticks;
         public int CompareTo(DateTime other)
         {

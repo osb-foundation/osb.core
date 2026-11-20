@@ -12,6 +12,7 @@ namespace System
     public unsafe struct IntPtr
     {
         private nint _value;
+        public const int Size = 8;
         public IntPtr(void* value) { _value = (nint)value; }
         public static IntPtr Zero => new IntPtr(null);
         public int ToInt32() => (int)_value;
@@ -21,6 +22,7 @@ namespace System
         public static explicit operator void*(IntPtr value) => (void*)value._value;
         public static bool operator ==(IntPtr a, IntPtr b) => a._value == b._value;
         public static bool operator !=(IntPtr a, IntPtr b) => a._value != b._value;
+        public static IntPtr operator +(IntPtr a, int offset) => new IntPtr((void*)((byte*)a.ToPointer() + offset));
         public override bool Equals(object obj) => obj is IntPtr other && _value == other._value;
         public override int GetHashCode() => (int)_value;
         public override string ToString() => _value.ToString();
@@ -28,6 +30,9 @@ namespace System
 
     [StructLayout(LayoutKind.Sequential)]
     public struct UIntPtr { private nuint _value; }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct UInt32 { private uint _value; public const uint MaxValue = 0xFFFFFFFFu; }
 
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct ReadOnlySpan<T>
@@ -60,5 +65,19 @@ namespace System
             Array.Copy(_array, _start, result, 0, _length);
             return result;
         }
+    }
+
+    public enum GCHandleType { Normal = 0, Weak = 1, WeakTrackResurrection = 2, Pinned = 3 }
+
+    public struct GCHandle
+    {
+        private IntPtr _handle;
+        public static GCHandle Alloc(object value) => default;
+        public static GCHandle Alloc(object value, GCHandleType type) => default;
+        public static GCHandle FromIntPtr(IntPtr value) => default;
+        public static IntPtr ToIntPtr(GCHandle handle) => default;
+        public object Target => null;
+        public void Free() { }
+        public IntPtr AddrOfPinnedObject() => default;
     }
 }

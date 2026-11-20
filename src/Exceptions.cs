@@ -53,4 +53,10 @@ namespace System
     {
         public IndexOutOfRangeException() : base("Index out of range") { }
     }
+
+    public class OverflowException : Exception
+    {
+        public OverflowException() : base("Arithmetic operation resulted in an overflow.") { }
+        public OverflowException(string message) : base(message) { }
+    }
 }

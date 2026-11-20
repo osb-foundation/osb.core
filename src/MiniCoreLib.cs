@@ -1,8 +1,5 @@
 // Minimal class library ("mini-CoreLib") for a freestanding NativeAOT kernel.
-// Modeled on dotnet/runtime's Test.CoreLib + Runtime.Base, trimmed to the set
-// of types/signatures the NativeAOT compiler (ilc) requires from the system module.
-// No GC, no exception handling, no reflection: just enough to compile C# that
-// runs bare metal.
+// M1-M2 additions in: CompilerSupport.cs, CollectionsInterfaces.cs, Delegates.cs, PrimitiveTypes.cs, TupleTypes.cs, StringComparer.cs, DateTime.cs, Exceptions.cs
 
 using System;
 using System.Runtime.CompilerServices;
@@ -49,10 +46,6 @@ namespace System
     [StructLayout(LayoutKind.Sequential)]
     public struct UInt64 { private ulong _value; }
     [StructLayout(LayoutKind.Sequential)]
-    public struct IntPtr { private nint _value; }
-    [StructLayout(LayoutKind.Sequential)]
-    public struct UIntPtr { private nuint _value; }
-    [StructLayout(LayoutKind.Sequential)]
     public struct Single { private float _value; }
     [StructLayout(LayoutKind.Sequential)]
     public struct Double { private double _value; }
@@ -76,6 +69,15 @@ namespace System
         private char _firstChar;
 #pragma warning restore
         public int Length => _stringLength;
+        public char this[int index] => throw null;
+        public static string Concat(string s1, string s2) => throw null;
+        public static string Concat(string s1, string s2, string s3) => throw null;
+        public static string Concat(params string[] values) => throw null;
+        public static string Concat(object arg0) => throw null;
+        public static string Concat(object arg0, object arg1) => throw null;
+        public static string Concat(object arg0, object arg1, object arg2) => throw null;
+        public static bool operator ==(string a, string b) => throw null;
+        public static bool operator !=(string a, string b) => throw null;
     }
 
     public class Array
@@ -87,6 +89,8 @@ namespace System
         private int _numComponents;
 #pragma warning restore 649
         public int Length => _numComponents;
+        public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length) => throw null;
+        public static void Copy(Array sourceArray, long sourceIndex, Array destinationArray, long destinationIndex, long length) => throw null;
     }
 
     // Generic arrays (T[]) are represented by this pseudo-type; the compiler
@@ -141,9 +145,6 @@ namespace System
         public bool AllowMultiple { get; set; }
         public bool Inherited { get; set; }
     }
-
-    public class Exception { }
-    public sealed class SystemException : Exception { }
 
     public class AppContext
     {
@@ -234,6 +235,12 @@ namespace System.Runtime.InteropServices
 
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class UnmanagedCallConvAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Parameter)]
+    public sealed class OutAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Parameter)]
+    public sealed class InAttribute : Attribute { }
 
     public interface IDynamicInterfaceCastable
     {
@@ -398,7 +405,7 @@ namespace Internal.Runtime.CompilerHelpers
         internal static void ThrowMissingFieldException(ExceptionStringID id, string fieldName) => Fail();
         internal static void ThrowFileNotFoundException(ExceptionStringID id, string fileName) => Fail();
         internal static void ThrowInvalidProgramException(ExceptionStringID id) => Fail();
-        internal static void ThrowInvalidProgramExceptionWithArgument(ExceptionStringID id, string methodName) => Fail();
+        internal static void ThrowInvalidProgramExceptionWithArgument(ExceptionStringID id, string methodName) => throw null;
         internal static void ThrowMarshalDirectiveException(ExceptionStringID id) => Fail();
         internal static void ThrowAmbiguousMatchException(ExceptionStringID id) => Fail();
         internal static void ThrowNotSupportedInlineArrayEqualsGetHashCode() => Fail();

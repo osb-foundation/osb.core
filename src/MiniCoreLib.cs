@@ -203,35 +203,16 @@ namespace System.Runtime.InteropServices
     public enum CallingConvention { Winapi = 1, Cdecl = 2, StdCall = 3 }
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
-    public sealed class StructLayoutAttribute : Attribute
-    {
-        public StructLayoutAttribute(LayoutKind layoutKind) { }
-        public StructLayoutAttribute(short layoutKind) { }
-        public CharSet CharSet;
-        public int Pack;
-        public int Size;
-    }
+    public sealed class StructLayoutAttribute : Attribute { public StructLayoutAttribute(LayoutKind layoutKind) { } public StructLayoutAttribute(short layoutKind) { } public CharSet CharSet; public int Pack; public int Size; }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public sealed class FieldOffsetAttribute : Attribute
-    {
-        public FieldOffsetAttribute(int offset) { }
-    }
+    public sealed class FieldOffsetAttribute : Attribute { public FieldOffsetAttribute(int offset) { } }
 
     [AttributeUsage(AttributeTargets.Method)]
-    public sealed class DllImportAttribute : Attribute
-    {
-        public DllImportAttribute(string dllName) { }
-        public string EntryPoint;
-        public CharSet CharSet;
-    }
+    public sealed class DllImportAttribute : Attribute { public DllImportAttribute(string dllName) { } public string EntryPoint; public CharSet CharSet; }
 
     [AttributeUsage(AttributeTargets.Method)]
-    public sealed class UnmanagedCallersOnlyAttribute : Attribute
-    {
-        public Type[] CallConvs;
-        public string EntryPoint;
-    }
+    public sealed class UnmanagedCallersOnlyAttribute : Attribute { public Type[] CallConvs; public string EntryPoint; }
 
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class UnmanagedCallConvAttribute : Attribute { }
@@ -394,21 +375,13 @@ namespace Internal.Runtime.CompilerHelpers
     internal static class ThrowHelpers
     {
         static void Fail() { while (true) { } }
-        internal static void ThrowBodyRemoved() => Fail();
-        internal static void ThrowFeatureBodyRemoved() => Fail();
-        internal static void ThrowInstanceBodyRemoved() => Fail();
-        internal static void ThrowUnavailableType() => Fail();
-        internal static void ThrowBadImageFormatException(ExceptionStringID id) => Fail();
-        internal static void ThrowTypeLoadException(ExceptionStringID id, string className, string typeName) => Fail();
+        internal static void ThrowBodyRemoved() => Fail(); internal static void ThrowFeatureBodyRemoved() => Fail();
+        internal static void ThrowInstanceBodyRemoved() => Fail(); internal static void ThrowUnavailableType() => Fail();
+        internal static void ThrowBadImageFormatException(ExceptionStringID id) => Fail(); internal static void ThrowTypeLoadException(ExceptionStringID id, string className, string typeName) => Fail();
         internal static void ThrowTypeLoadExceptionWithArgument(ExceptionStringID id, string className, string typeName, string messageArg) => Fail();
-        internal static void ThrowMissingMethodException(ExceptionStringID id, string methodName) => Fail();
-        internal static void ThrowMissingFieldException(ExceptionStringID id, string fieldName) => Fail();
-        internal static void ThrowFileNotFoundException(ExceptionStringID id, string fileName) => Fail();
-        internal static void ThrowInvalidProgramException(ExceptionStringID id) => Fail();
-        internal static void ThrowInvalidProgramExceptionWithArgument(ExceptionStringID id, string methodName) => throw null;
-        internal static void ThrowMarshalDirectiveException(ExceptionStringID id) => Fail();
-        internal static void ThrowAmbiguousMatchException(ExceptionStringID id) => Fail();
-        internal static void ThrowNotSupportedInlineArrayEqualsGetHashCode() => Fail();
-        internal static void ThrowIndexOutOfRangeException() => Fail();
+        internal static void ThrowMissingMethodException(ExceptionStringID id, string methodName) => Fail(); internal static void ThrowMissingFieldException(ExceptionStringID id, string fieldName) => Fail();
+        internal static void ThrowFileNotFoundException(ExceptionStringID id, string fileName) => Fail(); internal static void ThrowInvalidProgramException(ExceptionStringID id) => Fail();
+        internal static void ThrowInvalidProgramExceptionWithArgument(ExceptionStringID id, string methodName) => throw null; internal static void ThrowMarshalDirectiveException(ExceptionStringID id) => Fail();
+        internal static void ThrowAmbiguousMatchException(ExceptionStringID id) => Fail(); internal static void ThrowNotSupportedInlineArrayEqualsGetHashCode() => Fail(); internal static void ThrowIndexOutOfRangeException() => Fail();
     }
 }

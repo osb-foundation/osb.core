@@ -119,8 +119,6 @@ namespace System
     // Generic arrays (T[]) are represented by this pseudo-type; the compiler
     // requires it to exist in the class library.
     internal class Array<T> : Array { }
-    public abstract class Delegate { }
-    public abstract class MulticastDelegate : Delegate { }
 
     public struct TypedReference
     {
@@ -173,6 +171,13 @@ namespace System
     public class AppContext
     {
         public static void SetData(string s, object o) { }
+    }
+
+    public static class GC
+    {
+        public static void Collect() { }
+        public static void WaitForPendingFinalizers() { }
+        public static int Generation(int maxGeneration) => 0;
     }
 }
 

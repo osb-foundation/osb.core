@@ -44,4 +44,5 @@ dotnet build
 ## Documentation Anchors
 
 - `README.md`: High-level project/user documentation.
-- `src/MiniCoreLib.cs`: The shared runtime library implementation.
+- `src/*.cs`: The shared runtime library implementation (MiniCoreLib.cs plus
+  PrimitiveTypes.cs, CompilerSupport.cs, RuntimeSupport.cs and friends).

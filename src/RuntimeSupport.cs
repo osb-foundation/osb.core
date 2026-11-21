@@ -38,6 +38,22 @@ namespace System.Runtime
         // Fallback: null check.
         public static bool IsInstanceOfClass(object? value, System.Type targetType) => value != null;
 
+        // IsInstanceOfInterface: compiler intrinsic for 'is' operations on
+        // interface types. ilc replaces calls to this with inline type-checking
+        // code generation. Fallback: null check.
+        public static bool IsInstanceOfInterface(object? value, System.Type targetType) => value != null;
+
+        // IsInstanceOfException: compiler intrinsic for exception type tests in
+        // filter/catch code generation. ilc replaces calls to this with inline
+        // type-checking code generation. Fallback: null check.
+        public static bool IsInstanceOfException(object? value) => value != null;
+
+        // IsInstanceOfAny: compiler intrinsic for 'is T' / 'as T' where T is a
+        // generic parameter (no runtime type handle exists at the call site).
+        // ilc replaces calls to this with inline type-checking code generation.
+        // Fallback: null check.
+        public static bool IsInstanceOfAny<T>(object? value) => value != null;
+
         // CheckCastAny: validates any cast. Fallback: null check.
         public static bool CheckCastAny(object? value, System.Type targetType) => value != null;
 

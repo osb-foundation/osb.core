@@ -13,4 +13,33 @@ namespace System
     public delegate void Action<T>(T arg);
     public delegate void Action<T1, T2>(T1 arg1, T2 arg2);
     public delegate void Action<T1, T2, T3>(T1 arg1, T2 arg2, T3 arg3);
+
+    public abstract class Delegate
+    {
+        protected object? _target;
+        protected IntPtr _methodPtr;
+        protected IntPtr _methodPtrAux;
+        protected IntPtr _extraFunctionPointerOrData;
+
+        public static Delegate InitializeClosedInstance(Delegate d, object? target, IntPtr methodPtr)
+        {
+            d._target = target;
+            d._methodPtr = methodPtr;
+            return d;
+        }
+
+        public static Delegate InitializeOpenStaticThunk(Delegate d, IntPtr methodPtr)
+        {
+            d._target = null;
+            d._methodPtr = methodPtr;
+            return d;
+        }
+    }
+
+    public abstract class MulticastDelegate : Delegate
+    {
+        public static Delegate Combine(Delegate? a, Delegate? b) => a ?? b;
+
+        public static Delegate Remove(Delegate source, Delegate value) => source;
+    }
 }

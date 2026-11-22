@@ -68,4 +68,37 @@ namespace System.Collections.Generic
         bool Equals(T x, T y);
         int GetHashCode(T obj);
     }
+
+    public class EqualityComparer<T> : IEqualityComparer<T>
+    {
+        public static EqualityComparer<T> Default { get; } = new EqualityComparer<T>();
+
+        public virtual bool Equals(T x, T y)
+        {
+            if (x == null && y == null) return true;
+            if (x == null || y == null) return false;
+            return x.Equals(y);
+        }
+
+        public virtual int GetHashCode(T obj)
+        {
+            if (obj == null) return 0;
+            int h = obj.GetHashCode();
+            return h;
+        }
+    }
+
+    public struct KeyValuePair<TKey, TValue>
+    {
+        public TKey Key { get; }
+        public TValue Value { get; }
+        public KeyValuePair(TKey key, TValue value) { Key = key; Value = value; }
+    }
+
+    public interface IReadOnlyDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
+    {
+        TValue this[TKey key] { get; }
+        bool TryGetValue(TKey key, out TValue value);
+        int Count { get; }
+    }
 }

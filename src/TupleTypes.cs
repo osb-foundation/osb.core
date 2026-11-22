@@ -28,7 +28,26 @@ namespace System
             h = h * 31 + (Item2 != null ? Item2.GetHashCode() : 0);
             return h;
         }
-        public override string ToString() => "(" + (Item1?.ToString() ?? "null") + ", " + (Item2?.ToString() ?? "null") + ")";
+        public override string ToString()
+        {
+            string s1;
+            if (Item1 == null) s1 = "null";
+            else
+            {
+                string t = Item1.ToString();
+                if (t == null) s1 = "null";
+                else s1 = t;
+            }
+            string s2;
+            if (Item2 == null) s2 = "null";
+            else
+            {
+                string t = Item2.ToString();
+                if (t == null) s2 = "null";
+                else s2 = t;
+            }
+            return "(" + s1 + ", " + s2 + ")";
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -58,7 +77,34 @@ namespace System
             h = h * 31 + (Item3 != null ? Item3.GetHashCode() : 0);
             return h;
         }
-        public override string ToString() => "(" + (Item1?.ToString() ?? "null") + ", " + (Item2?.ToString() ?? "null") + ", " + (Item3?.ToString() ?? "null") + ")";
+        public override string ToString()
+        {
+            string s1;
+            if (Item1 == null) s1 = "null";
+            else
+            {
+                string t = Item1.ToString();
+                if (t == null) s1 = "null";
+                else s1 = t;
+            }
+            string s2;
+            if (Item2 == null) s2 = "null";
+            else
+            {
+                string t = Item2.ToString();
+                if (t == null) s2 = "null";
+                else s2 = t;
+            }
+            string s3;
+            if (Item3 == null) s3 = "null";
+            else
+            {
+                string t = Item3.ToString();
+                if (t == null) s3 = "null";
+                else s3 = t;
+            }
+            return "(" + s1 + ", " + s2 + ", " + s3 + ")";
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -93,6 +139,41 @@ namespace System
             h = h * 31 + (Item4 != null ? Item4.GetHashCode() : 0);
             return h;
         }
-        public override string ToString() => "(" + (Item1?.ToString() ?? "null") + ", " + (Item2?.ToString() ?? "null") + ", " + (Item3?.ToString() ?? "null") + ", " + (Item4?.ToString() ?? "null") + ")";
+        public override string ToString()
+        {
+            string s1;
+            if (Item1 == null) s1 = "null";
+            else
+            {
+                string t = Item1.ToString();
+                if (t == null) s1 = "null";
+                else s1 = t;
+            }
+            string s2;
+            if (Item2 == null) s2 = "null";
+            else
+            {
+                string t = Item2.ToString();
+                if (t == null) s2 = "null";
+                else s2 = t;
+            }
+            string s3;
+            if (Item3 == null) s3 = "null";
+            else
+            {
+                string t = Item3.ToString();
+                if (t == null) s3 = "null";
+                else s3 = t;
+            }
+            string s4;
+            if (Item4 == null) s4 = "null";
+            else
+            {
+                string t = Item4.ToString();
+                if (t == null) s4 = "null";
+                else s4 = t;
+            }
+            return "(" + s1 + ", " + s2 + ", " + s3 + ", " + s4 + ")";
+        }
     }
 }

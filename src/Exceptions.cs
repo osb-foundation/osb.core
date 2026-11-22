@@ -8,7 +8,11 @@ namespace System
         public string Message { get; }
         public Exception() { }
         public Exception(string message) { Message = message; }
-        public override string ToString() => Message ?? "";
+        public override string ToString()
+        {
+            if (Message == null) return "";
+            return Message;
+        }
     }
 
     public class ArgumentException : Exception
@@ -61,5 +65,11 @@ namespace System
     {
         public OverflowException() : base("Arithmetic operation resulted in an overflow.") { }
         public OverflowException(string message) : base(message) { }
+    }
+
+    public class FormatException : Exception
+    {
+        public FormatException() { }
+        public FormatException(string message) : base(message) { }
     }
 }

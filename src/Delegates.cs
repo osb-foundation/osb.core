@@ -38,7 +38,11 @@ namespace System
 
     public abstract class MulticastDelegate : Delegate
     {
-        public static Delegate Combine(Delegate? a, Delegate? b) => a ?? b;
+        public static Delegate Combine(Delegate a, Delegate b)
+        {
+            if (a == null) return b;
+            return a;
+        }
 
         public static Delegate Remove(Delegate source, Delegate value) => source;
     }

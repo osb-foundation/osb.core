@@ -19,6 +19,7 @@ namespace System
     {
         public ArgumentException() { }
         public ArgumentException(string message) : base(message) { }
+        public ArgumentException(string message, string paramName) : base(message + " (Parameter '" + paramName + "')") { }
     }
 
     public class ArgumentNullException : ArgumentException
@@ -30,6 +31,7 @@ namespace System
     {
         public ArgumentOutOfRangeException() { }
         public ArgumentOutOfRangeException(string paramName) : base(paramName) { }
+        public ArgumentOutOfRangeException(string message, string paramName) : base(message + " (Parameter '" + paramName + "')") { }
     }
 
     public class InvalidOperationException : Exception
@@ -71,5 +73,12 @@ namespace System
     {
         public FormatException() { }
         public FormatException(string message) : base(message) { }
+    }
+
+    public class ObjectDisposedException : Exception
+    {
+        public ObjectDisposedException() { }
+        public ObjectDisposedException(string objectName) : base("Cannot access a disposed object: " + objectName) { }
+        public ObjectDisposedException(string objectName, string message) : base("Cannot access a disposed object: " + objectName + ". " + message) { }
     }
 }

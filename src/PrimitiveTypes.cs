@@ -20,9 +20,15 @@ namespace System
         public void* ToPointer() => (void*)_value;
         public static explicit operator IntPtr(void* value) => new IntPtr(value);
         public static explicit operator void*(IntPtr value) => (void*)value._value;
+        public static explicit operator IntPtr(long value) => new IntPtr((void*)value);
+        public static explicit operator IntPtr(ulong value) => new IntPtr((void*)value);
+        public static explicit operator long(IntPtr value) => (long)value._value;
+        public static explicit operator ulong(IntPtr value) => (ulong)value._value;
         public static bool operator ==(IntPtr a, IntPtr b) => a._value == b._value;
         public static bool operator !=(IntPtr a, IntPtr b) => a._value != b._value;
         public static IntPtr operator +(IntPtr a, int offset) => new IntPtr((void*)((byte*)a.ToPointer() + offset));
+        public static IntPtr operator +(IntPtr a, long offset) => new IntPtr((void*)((byte*)a.ToPointer() + offset));
+        public static IntPtr operator +(IntPtr a, ulong offset) => new IntPtr((void*)((byte*)a.ToPointer() + offset));
         public override bool Equals(object obj) => obj is IntPtr other && _value == other._value;
         public override int GetHashCode() => (int)_value;
         public override string ToString() => _value.ToString();

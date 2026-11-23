@@ -29,7 +29,7 @@ namespace System
 #pragma warning disable 0169
     public struct Boolean { private bool _value; }
     [StructLayout(LayoutKind.Sequential)]
-    public struct Char { private char _value; public static bool IsHighSurrogate(char c) => c >= 0xD800 && c <= 0xDBFF; public static bool IsLowSurrogate(char c) => c >= 0xDC00 && c <= 0xDFFF; public static int ConvertToUtf32(char highSurrogate, char lowSurrogate) => ((highSurrogate - 0xD800) << 10) + (lowSurrogate - 0xDC00) + 0x10000; public static bool IsDigit(char c) => c >= '0' && c <= '9'; public static bool IsLetter(char c) => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); public static bool IsLetterOrDigit(char c) => IsLetter(c) || IsDigit(c); }
+    public struct Char { private char _value; public static bool IsHighSurrogate(char c) => c >= 0xD800 && c <= 0xDBFF; public static bool IsLowSurrogate(char c) => c >= 0xDC00 && c <= 0xDFFF; public static int ConvertToUtf32(char highSurrogate, char lowSurrogate) => ((highSurrogate - 0xD800) << 10) + (lowSurrogate - 0xDC00) + 0x10000; public static bool IsDigit(char c) => c >= '0' && c <= '9'; public static bool IsLetter(char c) => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); public static bool IsLetterOrDigit(char c) => IsLetter(c) || IsDigit(c); public static bool IsWhiteSpace(char c) => c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v' || c == '\f'; public override string ToString() => ""; }
     [StructLayout(LayoutKind.Sequential)]
     public struct SByte { private sbyte _value; }
     [StructLayout(LayoutKind.Sequential)]
@@ -39,7 +39,8 @@ namespace System
     [StructLayout(LayoutKind.Sequential)]
     public struct UInt16 { private ushort _value; }
     [StructLayout(LayoutKind.Sequential)]
-    public struct Int32 { private int _value; public const int MaxValue = 0x7FFFFFFF; public static bool TryParse(string s, out int result) { result = 0; return false; } public static int Parse(string s) => 0; public static int Parse(string s, IFormatProvider provider) => 0; public static int Parse(string s, NumberStyles style, IFormatProvider provider) => 0; }
+    public struct Int32 { private int _value; public const int MaxValue = 0x7FFFFFFF; public static bool TryParse(string s, out int result) { result = 0; return false; } public static int Parse(string s) => Parse(s, null); public static int Parse(string s, IFormatProvider provider) => Parse(s, NumberStyles.Integer, provider); public static int Parse(string s, NumberStyles style, IFormatProvider provider) => ParseInt32(s); private static int ParseInt32(string s) { if (string.IsNullOrEmpty(s)) throw new FormatException(); int i = 0, len = s.Length; while (i < len && char.IsWhiteSpace(s[i])) i++; bool neg = false; if (i < len) { if (s[i] == '-') { neg = true; i++; } else if (s[i] == '+') i++; } int result = 0; bool hasDigits = false; while (i < len) { char c = s[i]; if (c >= '0' && c <= '9') { result = result * 10 + (c - '0'); hasDigits = true; i++; } else if (char.IsWhiteSpace(c)) { while (i < len && char.IsWhiteSpace(s[i])) i++; break; } else { throw new FormatException(); } } if (!hasDigits) throw new FormatException(); return neg ? -result : result; } public override string ToString() { if (_value == 0) return "0"; bool neg = _value < 0; uint v = neg ? (uint)(-(long)_value) : (uint)_value; int len = 0; uint t = v; while (t > 0) { len++; t /= 10; } char[] chars = new char[len + (neg ? 1 : 0)]; int pos = chars.Length - 1; while (v > 0) { chars[pos--] = (char)('0' + (int)(v % 10)); v /= 10; } if (neg) chars[0] = '-'; return new string(chars); } }
+
     [StructLayout(LayoutKind.Sequential)]
     public struct UInt64 { private ulong _value; public const ulong MaxValue = 0xFFFFFFFFFFFFFFFFUL; }
     [StructLayout(LayoutKind.Sequential)]
@@ -47,13 +48,18 @@ namespace System
     [StructLayout(LayoutKind.Sequential)]
     public struct Single { private float _value; }
     [StructLayout(LayoutKind.Sequential)]
-    public struct Double { private double _value; public const double NaN = (double)0x7FF8000000000000L; public const double PositiveInfinity = (double)0x7FF0000000000000L; public const double NegativeInfinity = (double)0xFFF0000000000000L; public static bool IsNaN(double d) => d != d; public static bool IsPositiveInfinity(double d) => PositiveInfinity == d; public static bool IsNegativeInfinity(double d) => NegativeInfinity == d; public static double Parse(string s) => 0; public static double Parse(string s, IFormatProvider provider) => 0; public static double Parse(string s, NumberStyles style, IFormatProvider provider) => 0; }
+    public struct Double { private double _value; public const double NaN = (double)0x7FF8000000000000L; public const double PositiveInfinity = (double)0x7FF0000000000000L; public const double NegativeInfinity = (double)0xFFF0000000000000L; public static bool IsNaN(double d) => d != d; public static bool IsPositiveInfinity(double d) => PositiveInfinity == d; public static bool IsNegativeInfinity(double d) => NegativeInfinity == d; public static double Parse(string s) => Parse(s, null); public static double Parse(string s, IFormatProvider provider) => Parse(s, NumberStyles.Float, provider); public static double Parse(string s, NumberStyles style, IFormatProvider provider) => ParseDouble(s); private static double ParseDouble(string s) { if (s == null) return 0; int i = 0, len = s.Length; while (i < len && char.IsWhiteSpace(s[i])) i++; bool neg = false; if (i < len) { if (s[i] == '-') { neg = true; i++; } else if (s[i] == '+') i++; } double result = 0; while (i < len && s[i] >= '0' && s[i] <= '9') { result = result * 10 + (s[i] - '0'); i++; } if (i < len && s[i] == '.') { i++; double frac = 0; int fracDigits = 0; while (i < len && s[i] >= '0' && s[i] <= '9') { frac = frac * 10 + (s[i] - '0'); fracDigits++; i++; } if (fracDigits > 0) { double divisor = 1; for (int j = 0; j < fracDigits; j++) divisor *= 10; result += frac / divisor; } } return neg ? -result : result; } }
 #pragma warning restore 0169
 
     public abstract class ValueType { }
     public abstract class Enum : ValueType
     {
-        public override string ToString() => "";
+        public override string ToString()
+        {
+            // Minimal implementation - in freestanding we can't use reflection
+            // Derived enums should override this
+            return "Enum";
+        }
     }
 
     public interface IFormatProvider
@@ -110,38 +116,300 @@ namespace System
                 return chars[index];
             }
         }
-        public static string Concat(string s1, string s2) => s1 != null ? s2 != null ? s1 + s2 : s1 : s2 != null ? s2 : Empty;
-        public static string Concat(string s1, string s2, string s3) => s1 != null ? s2 != null ? s3 != null ? s1 + s2 + s3 : s1 + s2 : s3 != null ? s1 + s3 : s1 : s2 != null ? s3 != null ? s2 + s3 : s2 : s3 != null ? s3 : Empty;
-        public static string Concat(params string[] values) => Empty;
+        public static string Concat(string s1, string s2)
+        {
+            if (s1 == null) return s2 ?? Empty;
+            if (s2 == null) return s1;
+            int len1 = s1.Length;
+            int len2 = s2.Length;
+            if (len1 == 0) return s2;
+            if (len2 == 0) return s1;
+            char[] result = new char[len1 + len2];
+            for (int i = 0; i < len1; i++) result[i] = s1[i];
+            for (int i = 0; i < len2; i++) result[len1 + i] = s2[i];
+            return new string(result, 0, len1 + len2);
+        }
+
+        public static string Concat(string s1, string s2, string s3)
+        {
+            if (s1 == null) return Concat(s2, s3);
+            if (s2 == null) return Concat(s1, s3);
+            if (s3 == null) return Concat(s1, s2);
+            int len1 = s1.Length;
+            int len2 = s2.Length;
+            int len3 = s3.Length;
+            char[] result = new char[len1 + len2 + len3];
+            for (int i = 0; i < len1; i++) result[i] = s1[i];
+            for (int i = 0; i < len2; i++) result[len1 + i] = s2[i];
+            for (int i = 0; i < len3; i++) result[len1 + len2 + i] = s3[i];
+            return new string(result, 0, len1 + len2 + len3);
+        }
+
+        public static string Concat(params string[] values)
+        {
+            if (values == null || values.Length == 0) return Empty;
+            int totalLen = 0;
+            foreach (var v in values) if (v != null) totalLen += v.Length;
+            char[] result = new char[totalLen];
+            int pos = 0;
+            foreach (var v in values)
+            {
+                if (v != null)
+                {
+                    for (int i = 0; i < v.Length; i++) result[pos++] = v[i];
+                }
+            }
+            return new string(result, 0, totalLen);
+        }
+
         public static string Concat(object arg0) => arg0 != null ? arg0.ToString() : Empty;
-        public static string Concat(object arg0, object arg1) => (arg0 != null ? arg0.ToString() : Empty) + (arg1 != null ? arg1.ToString() : Empty);
-        public static string Concat(object arg0, object arg1, object arg2) => (arg0 != null ? arg0.ToString() : Empty) + (arg1 != null ? arg1.ToString() : Empty) + (arg2 != null ? arg2.ToString() : Empty);
-        public static string Concat(string s1, string s2, string s3, string s4) => s1 != null ? s2 != null ? s3 != null ? s4 != null ? s1 + s2 + s3 + s4 : s1 + s2 + s3 : s4 != null ? s1 + s2 + s4 : s1 + s2 : s3 != null ? s4 != null ? s1 + s3 + s4 : s1 + s3 : s4 != null ? s1 + s4 : s1 : s2 != null ? s3 != null ? s4 != null ? s2 + s3 + s4 : s2 + s3 : s4 != null ? s2 + s4 : s2 : s3 != null ? s4 != null ? s3 + s4 : s3 : s4 != null ? s4 : Empty;
-        public static bool operator ==(string a, string b) => throw null;
-        public static bool operator !=(string a, string b) => throw null;
-        public static bool Equals(string a, string b) => throw null;
-        public static bool Equals(string a, string b, StringComparison comparison) => throw null;
-        public bool Equals(string other) => throw null;
-        public bool Equals(string other, StringComparison comparison) => throw null;
+
+        public static string Concat(object arg0, object arg1)
+        {
+            var s0 = arg0 != null ? arg0.ToString() : Empty;
+            var s1 = arg1 != null ? arg1.ToString() : Empty;
+            return Concat(s0, s1);
+        }
+
+        public static string Concat(object arg0, object arg1, object arg2)
+        {
+            var s0 = arg0 != null ? arg0.ToString() : Empty;
+            var s1 = arg1 != null ? arg1.ToString() : Empty;
+            var s2 = arg2 != null ? arg2.ToString() : Empty;
+            return Concat(s0, s1, s2);
+        }
+
+        public static string Concat(string s1, string s2, string s3, string s4)
+        {
+            if (s1 == null) return Concat(s2, s3, s4);
+            if (s2 == null) return Concat(s1, s3, s4);
+            if (s3 == null) return Concat(s1, s2, s4);
+            if (s4 == null) return Concat(s1, s2, s3);
+            int len1 = s1.Length;
+            int len2 = s2.Length;
+            int len3 = s3.Length;
+            int len4 = s4.Length;
+            char[] result = new char[len1 + len2 + len3 + len4];
+            for (int i = 0; i < len1; i++) result[i] = s1[i];
+            for (int i = 0; i < len2; i++) result[len1 + i] = s2[i];
+            for (int i = 0; i < len3; i++) result[len1 + len2 + i] = s3[i];
+            for (int i = 0; i < len4; i++) result[len1 + len2 + len3 + i] = s4[i];
+            return new string(result, 0, len1 + len2 + len3 + len4);
+        }
+        public static bool operator ==(string a, string b)
+        {
+            if (a == null) return b == null;
+            if (b == null) return false;
+            if (a.Length != b.Length) return false;
+            for (int i = 0; i < a.Length; i++)
+                if (a[i] != b[i]) return false;
+            return true;
+        }
+        public static bool operator !=(string a, string b) => !(a == b);
+        public static bool Equals(string a, string b) => a == b;
+        public static bool Equals(string a, string b, StringComparison comparison) => a == b;
+        public bool Equals(string other) => this == other;
+        public bool Equals(string other, StringComparison comparison) => this == other;
         public static string Format(string format, object arg0) => throw null;
         public static string Format(string format, object arg0, object arg1) => throw null;
         public static string Format(string format, object arg0, object arg1, object arg2) => throw null;
         public static string Format(string format, params object[] args) => throw null;
         public static readonly string Empty = null;
-        public String(char[] value) { }
-        public String(char[] value, int startIndex, int length) { }
-        public static String Ctor(char[] value) => null;
-        public static String Ctor(char[] value, int startIndex, int length) => null;
-        [Intrinsic]
-        public static String FastAllocateString(int length) => null;
-        public string ToUpperInvariant() => this;
-        public string Substring(int startIndex) => throw null;
-        public string Substring(int startIndex, int length) => throw null;
-        public string PadLeft(int totalWidth, char paddingChar) => throw null;
-        public string TrimEnd(params char[] trimChars) => throw null;
-        public string Trim() => throw null;
-        public string Replace(string oldValue, string newValue) => throw null;
-        public bool EndsWith(string value) => false;
+        public static bool IsNullOrEmpty(string value) => value == null || value.Length == 0;
+        public String(char[] value)
+        {
+            if (value == null)
+            {
+                _stringLength = 0;
+                return;
+            }
+            _stringLength = value.Length;
+            // Copy data into this instance's buffer
+            unsafe
+            {
+                fixed (char* src = value)
+                {
+                    byte* obj = (byte*)Unsafe.AsPointer(ref _stringLength);
+                    byte* dst = (byte*)(obj + sizeof(int));
+                    Buffer.Memmove(dst, (byte*)src, (nuint)value.Length * 2);
+                }
+            }
+        }
+
+        public String(char[] value, int startIndex, int length)
+        {
+            if (value == null || length == 0)
+            {
+                _stringLength = 0;
+                return;
+            }
+            if (startIndex < 0 || length < 0 || startIndex + length > value.Length)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+            _stringLength = length;
+            // Copy data into this instance's buffer
+            unsafe
+            {
+                fixed (char* src = value)
+                {
+                    byte* obj = (byte*)Unsafe.AsPointer(ref _stringLength);
+                    byte* dst = (byte*)(obj + sizeof(int));
+                    Buffer.Memmove(dst, (byte*)(src + startIndex), (nuint)length * 2);
+                }
+            }
+        }
+
+        public String(char c, int count)
+        {
+            if (count < 0) throw new ArgumentOutOfRangeException();
+            _stringLength = count;
+            // Fill buffer with the character
+            unsafe
+            {
+                byte* obj = (byte*)Unsafe.AsPointer(ref _stringLength);
+                byte* dst = (byte*)(obj + sizeof(int));
+                for (int i = 0; i < count; i++)
+                {
+                    dst[i * 2] = (byte)c;
+                    dst[i * 2 + 1] = 0;
+                }
+            }
+        }
+
+        public static String Ctor(char[] value)
+        {
+            var result = FastAllocateString(value != null ? value.Length : 0);
+            if (result != null && value != null && value.Length > 0)
+            {
+                CopyChars(value, 0, result, 0, value.Length);
+            }
+            return result;
+        }
+
+        public static String Ctor(char[] value, int startIndex, int length)
+        {
+            if (startIndex < 0 || length < 0 || (value != null && startIndex + length > value.Length))
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+            var result = FastAllocateString(length);
+            if (result != null && length > 0 && value != null)
+            {
+                CopyChars(value, startIndex, result, 0, length);
+            }
+            return result;
+        }
+
+        private static void CopyChars(char[] src, int srcIndex, String dst, int dstIndex, int count)
+        {
+            unsafe
+            {
+                byte* obj = (byte*)Unsafe.AsPointer(ref dst._stringLength);
+                byte* dstData = (byte*)(obj + sizeof(int));
+                for (int i = 0; i < count; i++)
+                {
+                    dstData[(dstIndex + i) * 2] = (byte)src[srcIndex + i];
+                    dstData[(dstIndex + i) * 2 + 1] = 0;
+                }
+            }
+        }
+
+        [DllImport("osbnative", EntryPoint = "RhNewString")]
+        private static extern ulong RhNewStringRaw(IntPtr methodTable, int length);
+
+        // Cached String MethodTable - initialized on first use
+        private static IntPtr s_stringMethodTable = IntPtr.Zero;
+
+        public static String FastAllocateString(int length)
+        {
+            if (length < 0) throw new ArgumentOutOfRangeException();
+
+            // Obtain a valid String MethodTable on first use.
+            if (s_stringMethodTable == IntPtr.Zero)
+            {
+                s_stringMethodTable = GetStringMethodTable();
+            }
+
+            ulong ptr = RhNewStringRaw(s_stringMethodTable, length);
+            if (ptr == 0) return null;
+            String result = default!;
+            ref ulong resultRef = ref Unsafe.As<String, ulong>(ref result);
+            resultRef = ptr;
+            result._stringLength = length;
+            return result;
+        }
+
+        // Reads the MethodTable pointer (first 8 bytes) from a string object.
+        private static unsafe IntPtr GetStringMethodTable()
+        {
+            string s = "\0"; // force a string object to exist
+            byte* obj = (byte*)Unsafe.AsPointer(ref s._stringLength);
+            obj -= sizeof(IntPtr); // _stringLength is at offset 8; MT is at offset 0
+            return *(IntPtr*)obj;
+        }
+
+        public string ToUpperInvariant()
+        {
+            if (Length == 0) return this;
+            var chars = new char[Length];
+            for (int i = 0; i < Length; i++)
+            {
+                char c = this[i];
+                chars[i] = (c >= 'a' && c <= 'z') ? (char)(c - 'a' + 'A') : c;
+            }
+            return Ctor(chars);
+        }
+
+        public string Substring(int startIndex)
+        {
+            return Substring(startIndex, Length - startIndex);
+        }
+
+        public string Substring(int startIndex, int length)
+        {
+            if (startIndex < 0 || length < 0 || startIndex + length > Length)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+            if (length == 0) return Empty;
+            var chars = new char[length];
+            for (int i = 0; i < length; i++)
+            {
+                chars[i] = this[startIndex + i];
+            }
+            return Ctor(chars);
+        }
+
+        public string PadLeft(int totalWidth, char paddingChar)
+        {
+            if (totalWidth <= Length) return this;
+            int padCount = totalWidth - Length;
+            var chars = new char[totalWidth];
+            for (int i = 0; i < padCount; i++)
+            {
+                chars[i] = paddingChar;
+            }
+            for (int i = 0; i < Length; i++)
+            {
+                chars[padCount + i] = this[i];
+            }
+            return Ctor(chars);
+        }
+
+        public string TrimEnd(params char[] trimChars) => this;
+        public string Trim() => this;
+        public string Replace(string oldValue, string newValue) => this;
+        public bool EndsWith(string value)
+        {
+            if (value == null) return false;
+            if (value.Length > Length) return false;
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (this[Length - value.Length + i] != value[i]) return false;
+            }
+            return true;
+        }
     }
 }
 
@@ -161,16 +429,8 @@ namespace System.Text
         public StringBuilder(int capacity)
         {
             if (capacity > MaxBufferSize) capacity = MaxBufferSize;
-            if (!_bufferInUse)
-            {
-                _bufferInUse = true;
-                _chars = _sharedBuffer ??= new char[MaxBufferSize];
-            }
-            else
-            {
-                // Fallback: allocate small array (may fail in freestanding)
-                _chars = new char[capacity];
-            }
+            // Always allocate a fresh array to avoid static field init issues
+            _chars = new char[capacity];
             _length = 0;
         }
 
@@ -249,7 +509,10 @@ namespace System.Text
             if (value != null)
             {
                 EnsureCapacity(_length + value.Length);
-                Array.Copy(value, 0, _chars, _length, value.Length);
+                for (int i = 0; i < value.Length; i++)
+                {
+                    _chars[_length + i] = value[i];
+                }
                 _length += value.Length;
             }
             return this;
@@ -260,7 +523,10 @@ namespace System.Text
             if (value != null)
             {
                 EnsureCapacity(_length + charCount);
-                Array.Copy(value, startIndex, _chars, _length, charCount);
+                for (int i = 0; i < charCount; i++)
+                {
+                    _chars[_length + i] = value[startIndex + i];
+                }
                 _length += charCount;
             }
             return this;
@@ -288,7 +554,7 @@ namespace System.Text
 
         public override string ToString()
         {
-            return new string(_chars, 0, _length);
+            return System.String.Ctor(_chars, 0, _length);
         }
 
         public void Clear()
@@ -301,6 +567,18 @@ namespace System.Text
             if (required > MaxBufferSize)
             {
                 throw new ArgumentOutOfRangeException();
+            }
+            if (_chars == null || _chars.Length < required)
+            {
+                var newSize = _chars != null ? _chars.Length * 2 : 16;
+                if (newSize < required) newSize = required;
+                if (newSize > MaxBufferSize) newSize = MaxBufferSize;
+                var newChars = new char[newSize];
+                for (int i = 0; i < _length; i++)
+                {
+                    newChars[i] = _chars[i];
+                }
+                _chars = newChars;
             }
         }
     }
@@ -354,7 +632,15 @@ namespace System
         public static void Copy(Array sourceArray, Array destinationArray, int length) =>
             Copy(sourceArray, 0, destinationArray, 0, length);
         public static void Clear(Array array, int index, int length) => throw null;
-        public static T[] Empty<T>() => throw null;
+        public static T[] Empty<T>()
+        {
+            return EmptyArray<T>.Value;
+        }
+
+    internal static class EmptyArray<T>
+    {
+        public static readonly T[] Value = new T[0];
+    }
         public static void Resize<T>(ref T[] array, int newSize) => throw null;
         public static int IndexOf(Array array, object value) => -1;
     }

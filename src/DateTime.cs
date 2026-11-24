@@ -11,6 +11,7 @@ namespace System
     {
         private readonly long _ticks;
         public DateTime(long ticks) { _ticks = ticks; }
+        public DateTime(int year, int month, int day) { _ticks = 0; }
         public long Ticks => _ticks;
         public static DateTime UtcNow => new DateTime(0);
         public static DateTime MinValue => new DateTime(0);

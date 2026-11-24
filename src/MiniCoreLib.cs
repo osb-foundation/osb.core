@@ -89,7 +89,12 @@ namespace System
         Any = AllowLeadingWhite | AllowTrailingWhite | AllowLeadingSign | AllowDecimalPoint | AllowThousands | AllowCurrencySymbol | AllowExponent,
     }
 
-    public struct Nullable<T> where T : struct { public bool HasValue; public T Value; }
+    public struct Nullable<T> where T : struct
+    {
+        public bool HasValue;
+        public T Value;
+        public Nullable(T value) { HasValue = true; Value = value; }
+    }
 
     [StructLayout(LayoutKind.Sequential)]
     public class String
@@ -196,7 +201,7 @@ namespace System
             for (int i = 0; i < len4; i++) result[len1 + len2 + len3 + i] = s4[i];
             return new string(result, 0, len1 + len2 + len3 + len4);
         }
-        public static bool operator ==(string a, string b)
+        public static bool operator ==(String a, String b)
         {
             if (a == null) return b == null;
             if (b == null) return false;
@@ -205,7 +210,7 @@ namespace System
                 if (a[i] != b[i]) return false;
             return true;
         }
-        public static bool operator !=(string a, string b) => !(a == b);
+        public static bool operator !=(String a, String b) => !(a == b);
         public static bool Equals(string a, string b) => a == b;
         public static bool Equals(string a, string b, StringComparison comparison) => a == b;
         public bool Equals(string other) => this == other;
@@ -277,6 +282,16 @@ namespace System
             }
         }
 
+        public unsafe String(char* value, int length)
+        {
+            if (length < 0) throw new ArgumentOutOfRangeException();
+            _stringLength = length;
+            if (length == 0) return;
+            byte* obj = (byte*)Unsafe.AsPointer(ref _stringLength);
+            byte* dst = (byte*)(obj + sizeof(int));
+            Buffer.Memmove(dst, (byte*)value, (nuint)length * 2);
+        }
+
         public static String Ctor(char[] value)
         {
             var result = FastAllocateString(value != null ? value.Length : 0);
@@ -313,6 +328,19 @@ namespace System
                     dstData[(dstIndex + i) * 2 + 1] = 0;
                 }
             }
+        }
+
+        public static unsafe String Ctor(char* value, int length)
+        {
+            if (length < 0) throw new ArgumentOutOfRangeException();
+            var result = FastAllocateString(length);
+            if (result != null && length > 0 && value != null)
+            {
+                byte* obj = (byte*)Unsafe.AsPointer(ref result._stringLength);
+                byte* dst = (byte*)(obj + sizeof(int));
+                Buffer.Memmove(dst, (byte*)value, (nuint)length * 2);
+            }
+            return result;
         }
 
         [DllImport("osbnative", EntryPoint = "RhNewString")]
@@ -409,6 +437,27 @@ namespace System
                 if (this[Length - value.Length + i] != value[i]) return false;
             }
             return true;
+        }
+
+        public bool Contains(string value)
+        {
+            if (value == null) return false;
+            if (value.Length == 0) return true;
+            if (value.Length > Length) return false;
+            for (int i = 0; i <= Length - value.Length; i++)
+            {
+                bool match = true;
+                for (int j = 0; j < value.Length; j++)
+                {
+                    if (this[i + j] != value[j])
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match) return true;
+            }
+            return false;
         }
     }
 }
@@ -899,7 +948,7 @@ namespace Internal.Runtime.CompilerHelpers
         static void RhpFallbackFailFast() { while (true) { } }
     }
 
-    internal static class ThrowHelpers
+internal static class ThrowHelpers
     {
         static void Fail() { while (true) { } }
         internal static void ThrowBodyRemoved() => Fail(); internal static void ThrowFeatureBodyRemoved() => Fail();
@@ -909,7 +958,21 @@ namespace Internal.Runtime.CompilerHelpers
         internal static void ThrowMissingMethodException(ExceptionStringID id, string methodName) => Fail(); internal static void ThrowMissingFieldException(ExceptionStringID id, string fieldName) => Fail();
         internal static void ThrowFileNotFoundException(ExceptionStringID id, string fileName) => Fail(); internal static void ThrowInvalidProgramException(ExceptionStringID id) => Fail();
         internal static void ThrowInvalidProgramExceptionWithArgument(ExceptionStringID id, string methodName) => throw null; internal static void ThrowMarshalDirectiveException(ExceptionStringID id) => Fail();
-        internal static void ThrowAmbiguousMatchException(ExceptionStringID id) => Fail();         internal static void ThrowNotSupportedInlineArrayEqualsGetHashCode() => Fail(); internal static void ThrowIndexOutOfRangeException() => Fail();
+        internal static void ThrowAmbiguousMatchException(ExceptionStringID id) => Fail(); internal static void ThrowNotSupportedInlineArrayEqualsGetHashCode() => Fail(); internal static void ThrowIndexOutOfRangeException() => Fail();
+        internal static void ThrowOverflowException() => Fail();
+        internal static void ThrowPlatformNotSupportedException() => Fail();
+    }
+}
+
+namespace System.Runtime.Versioning
+{
+    // Stub for AssemblyAttributes.cs generation under NoStdLib
+    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false, Inherited = false)]
+    internal sealed class TargetFrameworkAttribute : Attribute
+    {
+        public TargetFrameworkAttribute(string frameworkName) { }
+        public string FrameworkName { get; }
+        public string FrameworkDisplayName { get; set; }
     }
 }
 

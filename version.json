@@ -1,0 +1,9 @@
+{
+  "schema": "osb.version.v1",
+  "component": "osb.core",
+  "version": "0.1.0",
+  "generation": 0,
+  "release": false,
+  "description": "Shared freestanding MiniCoreLib runtime stubs used by kernel, shell, toolkit and other OSB components.",
+  "repository": "osb-foundation/osb.core"
+}

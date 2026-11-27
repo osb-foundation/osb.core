@@ -10,6 +10,7 @@
  // moved here because MiniCoreLib.cs is at its 400-line source limit.
 
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace System.Runtime
@@ -83,8 +84,35 @@ namespace System.Runtime
         public static object? CastToType(object? value, global::System.Type targetType) => value;
 
         // StelemRef: stores a reference into an array element (with write barrier).
-        // Fallback: direct array element assignment.
-        public static void StelemRef(object[] array, int index, object value) => array[index] = value;
+        // The store must NOT be written as `array[index] = value`: ilc lowers a
+        // reference-array assignment back into a call to StelemRef, which made the
+        // managed fallback self-recursive (unbounded recursion -> stack/image
+        // corruption -> #UD). Instead, take a byref to the element with the
+        // GetArrayDataReference intrinsic and store through that byref. A byref
+        // store (stind.ref) lowers to a plain store, not a StelemRef call, so it
+        // terminates. In this freestanding no-GC runtime the GC write barrier
+        // (RhpAssignRef) is itself a plain store (`*dst = src`), so the byref store
+        // is semantically identical to the real NativeAOT write-barrier store.
+        public static unsafe void StelemRef(object[] array, int index, object value)
+        {
+            if ((uint)index >= (uint)array.Length)
+                throw new IndexOutOfRangeException();
+
+            ref object element = ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(array), index);
+            element = value;
+        }
+    }
+}
+
+namespace System.Runtime.InteropServices
+{
+    public static class MemoryMarshal
+    {
+        // ilc recognizes this intrinsic by name (IsMemoryMarshalGetArrayDataReference)
+        // and lowers it to a byref to the array's first element. The managed body is
+        // never executed; it only exists to satisfy the compiler's fallback path.
+        [Intrinsic]
+        public static ref T GetArrayDataReference<T>(T[] array) => ref GetArrayDataReference(array);
     }
 }
 

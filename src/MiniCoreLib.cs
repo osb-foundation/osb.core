@@ -459,6 +459,21 @@ namespace System
             }
             return false;
         }
+
+        public override int GetHashCode()
+        {
+            // FNV-1a hash algorithm
+            unchecked
+            {
+                uint hash = 2166136261;
+                for (int i = 0; i < Length; i++)
+                {
+                    hash ^= (uint)this[i];
+                    hash *= 16777619;
+                }
+                return (int)hash;
+            }
+        }
     }
 }
 
